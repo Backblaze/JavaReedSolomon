@@ -11,6 +11,9 @@ and SampleDecoder.  They show, in a very simple way, how to break a
 file into shards and encode parity, and then how to take a subset of
 the shards and reconstruct the original file.
 
+There is a Gradle build file to make a jar and run the tests.  Running
+it is simple.  Just type: `gradle build`
+
 We would like to send out a special thanks to James Plank at the
 University of Tennessee at Knoxville for his useful papers on erasure
 coding.  If you'd like an intro into how it all works, take a look at
