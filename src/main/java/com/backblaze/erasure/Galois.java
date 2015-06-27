@@ -170,6 +170,14 @@ public final class Galois {
     };
 
     /**
+     * A multiplication table for the Galois field.
+     *
+     * Using this table is an alternative to using the multiply() method,
+     * which uses log/exp table lookups.
+     */
+    public static byte [] [] MULTIPLICATION_TABLE = generateMultiplicationTable();
+
+    /**
      * Adds two elements of the field.  If you're in an inner loop,
      * you should inline this function: it's just XOR.
      */
@@ -276,6 +284,23 @@ public final class Galois {
             int log = logTable[i];
             result[log] = (byte) i;
             result[log + FIELD_SIZE - 1] = (byte) i;
+        }
+        return result;
+    }
+
+    /**
+     * Generates a multiplication table as an array of byte arrays.
+     *
+     * To get the result of multiplying a and b:
+     *
+     *     MULTIPLICATION_TABLE[a][b]
+     */
+    public static byte [] [] generateMultiplicationTable() {
+        byte [] [] result = new byte [256] [256];
+        for (int a = 0; a < FIELD_SIZE; a++) {
+            for (int b = 0; b < FIELD_SIZE; b++) {
+                result[a][b] = multiply((byte) a, (byte) b);
+            }
         }
         return result;
     }

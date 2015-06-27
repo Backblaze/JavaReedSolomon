@@ -126,6 +126,15 @@ public class GaloisTest {
         assertArrayEquals(polynomials, Galois.allPossiblePolynomials());
     }
 
+    @Test
+    public void testMultiplicationTable() {
+        byte [] [] table = Galois.MULTIPLICATION_TABLE;
+        for (int a = -128; a < 128; a++) {
+            for (int b = -128; b < 128; b++) {
+                assertEquals(Galois.multiply((byte) a, (byte) b), table[a & 0xFF][b & 0xFF]);
+            }
+        }
+    }
 
     @Test
     public void testWithPythonAnswers() {
