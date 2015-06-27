@@ -15,6 +15,7 @@ public class ReedSolomon {
     private final int parityShardCount;
     private final int totalShardCount;
     private final Matrix matrix;
+    private final CodingLoop codingLoop;
 
     /**
      * Rows from the matrix for encoding parity, each one as its own
@@ -23,11 +24,19 @@ public class ReedSolomon {
     private final byte [] [] parityRows;
 
     /**
-     * Initializes a new encoder/decoder.
+     * Creates a ReedSolomon codec with the default coding loop.
      */
-    public ReedSolomon(int dataShardCount, int parityShardCount) {
+    public static ReedSolomon create(int dataShardCount, int parityShardCount) {
+        return new ReedSolomon(dataShardCount, parityShardCount, new IndexShardInputExpCodingLoop());
+    }
+
+    /**
+     * Initializes a new encoder/decoder, with a chosen coding loop.
+     */
+    public ReedSolomon(int dataShardCount, int parityShardCount, CodingLoop codingLoop) {
         this.dataShardCount = dataShardCount;
         this.parityShardCount = parityShardCount;
+        this.codingLoop = codingLoop;
         this.totalShardCount = dataShardCount + parityShardCount;
         matrix = buildMatrix(dataShardCount, this.totalShardCount);
         parityRows = new byte [parityShardCount] [];
@@ -73,12 +82,13 @@ public class ReedSolomon {
 
         // Build the array of output buffers.
         byte [] [] outputs = new byte [parityShardCount] [];
-        for (int i = 0; i < parityShardCount; i++) {
-            outputs[i] = shards[dataShardCount + i];
-        }
+        System.arraycopy(shards, dataShardCount, outputs, 0, parityShardCount);
 
         // Do the coding.
-        codeSomeShards(parityRows, shards, outputs, parityShardCount,
+        codingLoop.codeSomeShards(
+                parityRows,
+                shards, dataShardCount,
+                outputs, parityShardCount,
                 offset, byteCount);
     }
 
@@ -97,12 +107,13 @@ public class ReedSolomon {
 
         // Build the array of buffers being checked.
         byte [] [] toCheck = new byte [parityShardCount] [];
-        for (int i = 0; i < parityShardCount; i++) {
-            toCheck[i] = shards[dataShardCount + i];
-        }
+        System.arraycopy(shards, dataShardCount, toCheck, 0, parityShardCount);
 
         // Do the checking.
-        return checkSomeShards(parityRows, shards, toCheck, parityShardCount,
+        return codingLoop.checkSomeShards(
+                parityRows,
+                shards, dataShardCount,
+                toCheck, parityShardCount,
                 firstByte, byteCount);
     }
 
@@ -188,7 +199,11 @@ public class ReedSolomon {
                 outputCount += 1;
             }
         }
-        codeSomeShards(matrixRows, subShards, outputs, outputCount, offset, byteCount);
+        codingLoop.codeSomeShards(
+                matrixRows,
+                subShards, dataShardCount,
+                outputs, outputCount,
+                offset, byteCount);
 
         // Now that we have all of the data shards intact, we can
         // compute any of the parity that is missing.
@@ -204,7 +219,11 @@ public class ReedSolomon {
                 outputCount += 1;
             }
         }
-        codeSomeShards(matrixRows, shards, outputs, outputCount, offset, byteCount);
+        codingLoop.codeSomeShards(
+                matrixRows,
+                shards, dataShardCount,
+                outputs, outputCount,
+                offset, byteCount);
     }
 
     /**
@@ -235,116 +254,6 @@ public class ReedSolomon {
         if (shardLength < offset + byteCount) {
             throw new IllegalArgumentException("buffers to small: " + byteCount + offset);
         }
-    }
-
-    /**
-     * Multiplies a subset of rows from a coding matrix by a full set of
-     * input shards to produce some output shards.
-     *
-     * @param matrixRows The rows from the matrix to use.
-     * @param inputs An array of byte arrays, each of which is one input shard.
-     *               The inputs array may have extra buffers after the ones
-     *               that are used.  They will be ignored.  The number of
-     *               inputs used is determined by the length of the
-     *               each matrix row.
-     * @param outputs Byte arrays where the computed shards are stored.  The
-     *                outputs array may also have extra, unused, elements
-     *                at the end.  The number of outputs computed, and the
-     *                number of matrix rows used, is determined by
-     *                outputCount.
-     * @param outputCount The number of outputs to compute.
-     * @param offset The index in the inputs and output of the first byte
-     *               to process.
-     * @param byteCount The number of bytes to process.
-     */
-    private void codeSomeShards(final byte [] [] matrixRows,
-                                final byte [] [] inputs,
-                                final byte [] [] outputs,
-                                final int outputCount,
-                                final int offset,
-                                final int byteCount) {
-
-        // This is the inner loop.  It needs to be fast.  Be careful
-        // if you change it.
-        //
-        // Note that dataShardCount is final in the class, so the
-        // compiler can load it just once, before the loop.  Explicitly
-        // adding a local variable does not make it faster.
-        //
-        // I have tried inlining Galois.multiply(), but it doesn't
-        // make things any faster.  The JIT compiler is known to inline
-        // methods, so it's probably already doing so.
-        //
-        // This method has been timed and compared with a C implementation.
-        // This Java version is only about 10% slower than C.
-
-        for (int iByte = offset; iByte < offset + byteCount; iByte++) {
-            for (int iRow = 0; iRow < outputCount; iRow++) {
-                byte [] matrixRow = matrixRows[iRow];
-                int value = 0;
-                for (int c = 0; c < dataShardCount; c++) {
-                    value ^= Galois.multiply(matrixRow[c], inputs[c][iByte]);
-                }
-                outputs[iRow][iByte] = (byte) value;
-            }
-        }
-    }
-
-    /**
-     * Multiplies a subset of rows from a coding matrix by a full set of
-     * input shards to produce some output shards, and checks that the
-     * the data is those shards matches what's expected.
-     *
-     * @param matrixRows The rows from the matrix to use.
-     * @param inputs An array of byte arrays, each of which is one input shard.
-     *               The inputs array may have extra buffers after the ones
-     *               that are used.  They will be ignored.  The number of
-     *               inputs used is determined by the length of the
-     *               each matrix row.
-     * @param toCheck Byte arrays where the computed shards are stored.  The
-     *                outputs array may also have extra, unused, elements
-     *                at the end.  The number of outputs computed, and the
-     *                number of matrix rows used, is determined by
-     *                outputCount.
-     * @param checkCount The number of outputs to compute.
-     * @param offset The index in the inputs and output of the first byte
-     *               to process.
-     * @param byteCount The number of bytes to process.
-     */
-    private boolean checkSomeShards(final byte [] [] matrixRows,
-                                    final byte [] [] inputs,
-                                    final byte [] [] toCheck,
-                                    final int checkCount,
-                                    final int offset,
-                                    final int byteCount) {
-
-        // This is the inner loop.  It needs to be fast.  Be careful
-        // if you change it.
-        //
-        // Note that dataShardCount is final in the class, so the
-        // compiler can load it just once, before the loop.  Explicitly
-        // adding a local variable does not make it faster.
-        //
-        // I have tried inlining Galois.multiply(), but it doesn't
-        // make things any faster.  The JIT compiler is known to inline
-        // methods, so it's probably already doing so.
-        //
-        // This method has been timed and compared with a C implementation.
-        // This Java version is only about 10% slower than C.
-
-        for (int iByte = offset; iByte < offset + byteCount; iByte++) {
-            for (int iRow = 0; iRow < checkCount; iRow++) {
-                byte [] matrixRow = matrixRows[iRow];
-                int value = 0;
-                for (int c = 0; c < dataShardCount; c++) {
-                    value ^= Galois.multiply(matrixRow[c], inputs[c][iByte]);
-                }
-                if (toCheck[iRow][iByte] != (byte) value) {
-                    return false;
-                }
-            }
-        }
-        return true;
     }
 
     /**

@@ -30,6 +30,7 @@ public class SampleDecoder {
 
     public static final int BYTES_IN_INT = 4;
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     public static void main(String [] arguments) throws IOException {
 
         // Parse the command line
@@ -80,7 +81,7 @@ public class SampleDecoder {
         }
 
         // Use Reed-Solomon to fill in the missing shards
-        ReedSolomon reedSolomon = new ReedSolomon(DATA_SHARDS, PARITY_SHARDS);
+        ReedSolomon reedSolomon = ReedSolomon.create(DATA_SHARDS, PARITY_SHARDS);
         reedSolomon.decodeMissing(shards, shardPresent, 0, shardSize);
 
         // Combine the data shards into one buffer for convenience.

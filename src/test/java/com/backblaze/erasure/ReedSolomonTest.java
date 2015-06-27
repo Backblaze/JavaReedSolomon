@@ -30,7 +30,7 @@ public class ReedSolomonTest {
      */
     @Test
     public void testZeroSizeEncode() {
-        ReedSolomon codec = new ReedSolomon(2, 1);
+        ReedSolomon codec = ReedSolomon.create(2, 1);
         byte [] [] shards = new byte [3] [0];
         codec.encodeParity(shards, 0, 0);
     }
@@ -41,7 +41,7 @@ public class ReedSolomonTest {
      */
     @Test
     public void testOneEncode() {
-        ReedSolomon codec = new ReedSolomon(5, 5);
+        ReedSolomon codec = ReedSolomon.create(5, 5);
         byte [] [] shards = new byte[10] [];
         shards[0] = new byte [] {0, 1};
         shards[1] = new byte [] {4, 5};
@@ -102,7 +102,7 @@ public class ReedSolomonTest {
         }
 
         // Encode.
-        ReedSolomon codec = new ReedSolomon(5, 5);
+        ReedSolomon codec = ReedSolomon.create(5, 5);
         codec.encodeParity(allShards, 0, dataLength);
 
         // Make a copy to decode with.

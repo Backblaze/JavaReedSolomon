@@ -79,7 +79,7 @@ public class SampleEncoder {
         }
 
         // Use Reed-Solomon to calculate the parity.
-        ReedSolomon reedSolomon = new ReedSolomon(DATA_SHARDS, PARITY_SHARDS);
+        ReedSolomon reedSolomon = ReedSolomon.create(DATA_SHARDS, PARITY_SHARDS);
         reedSolomon.encodeParity(shards, 0, shardSize);
 
         // Write out the resulting files.
