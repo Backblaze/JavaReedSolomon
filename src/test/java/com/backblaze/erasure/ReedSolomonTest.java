@@ -11,6 +11,7 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -69,11 +70,18 @@ public class ReedSolomonTest {
     }
 
     /**
-     * Checks that all of the coding loops produce the same results.
+     * Try a simple case of encoding and decoding.
      */
     @Test
-    public void testCodingLoopsProduceSameAnswers() {
-
+    public void testSimpleEncodeDecode() {
+        byte [] [] dataShards = new byte [] [] {
+                new byte [] { 0, 1 },
+                new byte [] { 1, 2 },
+                new byte [] { 1, 3 },
+                new byte [] { 2, 4 },
+                new byte [] { 3, 5 }
+        };
+        runEncodeDecode(dataShards);
     }
 
     /**
@@ -139,6 +147,67 @@ public class ReedSolomonTest {
                 shardPresent[i] = true;
             }
         }
+    }
+
+
+
+    /**
+     * Checks that all of the coding loops produce the same results.
+     */
+    @Test
+    public void testCodingLoopsProduceSameAnswers() {
+        final int DATA_COUNT = 5;
+        final int PARITY_COUNT = 5;
+        final int SHARD_SIZE = 2000;
+        final Random random = new Random(0);
+
+        // Make a set of input data shards
+        byte [] [] dataShards = new byte [DATA_COUNT] [SHARD_SIZE];
+        for (byte[] shard : dataShards) {
+            for (int iByte = 0; iByte < shard.length; iByte++) {
+                shard[iByte] = (byte) random.nextInt(256);
+            }
+        }
+
+        // Make a reference set of parity shards using an arbitrary coding
+        // loop.
+        byte [] [] expectedParityShards = computeParityShards(dataShards, ReedSolomon.create(DATA_COUNT, PARITY_COUNT));
+
+        // Check that all coding loops produce the same set of parity shards.
+        for (CodingLoop codingLoop : CodingLoop.ALL_CODING_LOOPS) {
+            ReedSolomon codec = new ReedSolomon(DATA_COUNT, PARITY_COUNT, codingLoop);
+            byte [] [] actualParityShards = computeParityShards(dataShards, codec);
+            for (int i = 0; i < PARITY_COUNT; i++) {
+                assertArrayEquals(expectedParityShards[i], actualParityShards[i]);
+            }
+        }
+    }
+
+    /**
+     * Given an array of data shards, computes parity and returns an array
+     * of the resulting parity shards.
+     */
+    private byte [] [] computeParityShards(byte [] [] dataShards, ReedSolomon codec) {
+        final int shardSize = dataShards[0].length;
+        final int totalShardCount = codec.getTotalShardCount();
+        final int dataShardCount = codec.getDataShardCount();
+        final int parityShardCount = codec.getParityShardCount();
+
+        final byte [] [] parityShards = new byte [parityShardCount] [shardSize];
+
+        final byte [] [] allShards = new byte [totalShardCount] [];
+        for (int iShard = 0; iShard < totalShardCount; iShard++) {
+            if (iShard < dataShardCount) {
+                allShards[iShard] = dataShards[iShard];
+            }
+            else {
+                allShards[iShard] = parityShards[iShard - dataShardCount];
+            }
+        }
+
+        codec.encodeParity(allShards, 0, shardSize);
+
+        return parityShards;
     }
 
     private void clearBytes(byte [] data) {
