@@ -15,6 +15,11 @@ public interface CodingLoop {
             };
 
     /**
+     * Returns the human-readable name for this codec.
+     */
+    String getName();
+
+    /**
      * Multiplies a subset of rows from a coding matrix by a full set of
      * input shards to produce some output shards.
      *
