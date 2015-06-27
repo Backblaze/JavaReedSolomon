@@ -8,6 +8,12 @@ package com.backblaze.erasure;
 
 public interface CodingLoop {
 
+    CodingLoop[] ALL_CODING_LOOPS =
+            new CodingLoop[] {
+                    new IndexShardInputExpCodingLoop(),
+                    new IndexShardInputTableCodingLoop()
+            };
+
     /**
      * Multiplies a subset of rows from a coding matrix by a full set of
      * input shards to produce some output shards.

@@ -117,7 +117,6 @@ public class ReedSolomon {
                 firstByte, byteCount);
     }
 
-
     /**
      * Given a list of shards, some of which contain data, fills in the
      * ones that don't have data.
