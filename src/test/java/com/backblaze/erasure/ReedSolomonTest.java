@@ -206,6 +206,11 @@ public class ReedSolomonTest {
         }
 
         codec.encodeParity(allShards, 0, shardSize);
+        allShards[parityShardCount - 1][0] += 1;
+        assertFalse(codec.isParityCorrect(allShards, 0, shardSize));
+        allShards[parityShardCount - 1][0] -= 1;
+        assertTrue(codec.isParityCorrect(allShards, 0, shardSize));
+
 
         return parityShards;
     }

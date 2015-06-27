@@ -11,7 +11,8 @@ public interface CodingLoop {
     CodingLoop[] ALL_CODING_LOOPS =
             new CodingLoop[] {
                     new IndexShardInputExpCodingLoop(),
-                    new IndexShardInputTableCodingLoop()
+                    new IndexShardInputTableCodingLoop(),
+                    new ShardInputIndexTableCodingLoop()
             };
 
     /**
