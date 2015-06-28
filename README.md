@@ -1,8 +1,9 @@
 # JavaReedSolomon
 
-This is a simple and efficient Reed-Solomon implementation in Java, which
-was originally built at Backblaze.  There is an overview of how the
-algorithm works in my [blog post](https://www.backblaze.com/blog/reed-solomon/).
+This is a simple and efficient Reed-Solomon implementation in Java,
+which was originally built at [Backblaze](https://www.backblaze.com).
+There is an overview of how the algorithm works in my [blog
+post](https://www.backblaze.com/blog/reed-solomon/).
 
 The ReedSolomon class does the encoding and decoding, and is supported
 by Matrix, which does matrix arithmetic, and Galois, which is a finite
