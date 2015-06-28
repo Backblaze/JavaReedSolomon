@@ -61,7 +61,7 @@ public class ReedSolomonBenchmark {
                 total.add(doOneMeasurement(codec, bufferSets));
             }
             System.out.println(String.format("\nAVERAGE: %s", total));
-            summaryLines.add(String.format("    %35s %s", codingLoop.getName(), total));
+            summaryLines.add(String.format("    %-35s %s", codingLoop.getName(), total));
         }
 
         System.out.println("\nSummary:\n");

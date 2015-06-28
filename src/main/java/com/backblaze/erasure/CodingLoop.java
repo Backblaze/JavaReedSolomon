@@ -8,12 +8,35 @@ package com.backblaze.erasure;
 
 public interface CodingLoop {
 
+    /**
+     * All of the available coding loop algorithms.
+     *
+     * The different choices nest the three loops in different orders,
+     * and either use the log/exponents tables, or use the multiplication
+     * table.
+     *
+     * The naming of the three loops is (with number of loops in benchmark):
+     *
+     *    "index"  - Index of byte within shard.  (200,000 bytes in each shard)
+     *
+     *    "shard"  - Which output shard is being computed.  (3 parity shards)
+     *
+     *    "input"  - Which input shard is being read.  (17 data shards)
+     *
+     * And the naming for multiplication method is:
+     *
+     *    "table"  - Use the multiplication table.
+     *
+     *    "exp"    - Use the logarithm/exponent table.
+     */
     CodingLoop[] ALL_CODING_LOOPS =
             new CodingLoop[] {
                     new IndexShardInputExpCodingLoop(),
                     new IndexShardInputTableCodingLoop(),
                     new ShardInputIndexExpCodingLoop(),
-                    new ShardInputIndexTableCodingLoop()
+                    new ShardInputIndexTableCodingLoop(),
+                    new InputShardIndexTableCodingLoop(),
+                    new InputIndexShardTableCodingLoop()
             };
 
     /**
