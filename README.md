@@ -16,6 +16,15 @@ the shards and reconstruct the original file.
 There is a Gradle build file to make a jar and run the tests.  Running
 it is simple.  Just type: `gradle build`
 
+The performance of the inner loop depends on the specefic processor
+you're running on.  There are twelve different permutations of the
+loop in this library, and the ReedSolomonBenchmark class will tell
+you which one is faster for your particular application.  The number
+of parity and data shards in the benchmark, as well as the buffer
+sizes, match the usage at Backblaze.  You can set the parameters of
+the benchmark to match your specific use before choosing a loop
+implementation. 
+
 We would like to send out a special thanks to James Plank at the
 University of Tennessee at Knoxville for his useful papers on erasure
 coding.  If you'd like an intro into how it all works, take a look at
