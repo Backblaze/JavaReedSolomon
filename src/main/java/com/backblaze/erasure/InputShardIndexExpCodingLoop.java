@@ -6,7 +6,7 @@
 
 package com.backblaze.erasure;
 
-public class ShardInputIndexTableCodingLoop implements CodingLoop {
+public class InputShardIndexExpCodingLoop implements CodingLoop {
 
     @Override
     public void codeSomeShards(
@@ -15,23 +15,25 @@ public class ShardInputIndexTableCodingLoop implements CodingLoop {
             byte[][] outputs, int outputCount,
             int offset, int byteCount) {
 
-        final byte [] [] table = Galois.MULTIPLICATION_TABLE;
-        for (int iShard = 0; iShard < outputCount; iShard++) {
-            final byte [] outputShard = outputs[iShard];
-            final byte[] matrixRow = matrixRows[iShard];
-            {
-                final int iInput = 0;
-                final byte [] inputShard = inputs[iInput];
-                final byte [] multTableRow = table[matrixRow[iInput] & 0xFF];
+        {
+            final int iInput = 0;
+            final byte[] inputShard = inputs[iInput];
+            for (int iShard = 0; iShard < outputCount; iShard++) {
+                final byte[] outputShard = outputs[iShard];
+                final byte[] matrixRow = matrixRows[iShard];
                 for (int iByte = offset; iByte < offset + byteCount; iByte++) {
-                    outputShard[iByte] = multTableRow[inputShard[iByte] & 0xFF];
+                    outputShard[iByte] = Galois.multiply(matrixRow[iInput], inputShard[iByte]);
                 }
             }
-            for (int iInput = 1; iInput < inputCount; iInput++) {
-                final byte [] inputShard = inputs[iInput];
-                final byte [] multTableRow = table[matrixRow[iInput] & 0xFF];
+        }
+
+        for (int iInput = 1; iInput < inputCount; iInput++) {
+            final byte[] inputShard = inputs[iInput];
+            for (int iShard = 0; iShard < outputCount; iShard++) {
+                final byte[] outputShard = outputs[iShard];
+                final byte[] matrixRow = matrixRows[iShard];
                 for (int iByte = offset; iByte < offset + byteCount; iByte++) {
-                    outputShard[iByte] ^= multTableRow[inputShard[iByte] & 0xFF];
+                    outputShard[iByte] ^= Galois.multiply(matrixRow[iInput], inputShard[iByte]);
                 }
             }
         }
@@ -66,5 +68,4 @@ public class ShardInputIndexTableCodingLoop implements CodingLoop {
         }
         return true;
     }
-
 }

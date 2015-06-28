@@ -9,11 +9,6 @@ package com.backblaze.erasure;
 public class InputShardIndexTableCodingLoop implements CodingLoop {
 
     @Override
-    public String getName() {
-        return "input/shard/index (mult table)";
-    }
-
-    @Override
     public void codeSomeShards(
             byte[][] matrixRows,
             byte[][] inputs, int inputCount,

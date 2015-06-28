@@ -6,7 +6,7 @@
 
 package com.backblaze.erasure;
 
-public class ShardInputIndexTableCodingLoop implements CodingLoop {
+public class ShardIndexInputTableCodingLoop implements CodingLoop {
 
     @Override
     public void codeSomeShards(
@@ -17,20 +17,18 @@ public class ShardInputIndexTableCodingLoop implements CodingLoop {
 
         final byte [] [] table = Galois.MULTIPLICATION_TABLE;
         for (int iShard = 0; iShard < outputCount; iShard++) {
-            final byte [] outputShard = outputs[iShard];
+            final byte[] outputShard = outputs[iShard];
             final byte[] matrixRow = matrixRows[iShard];
-            {
-                final int iInput = 0;
-                final byte [] inputShard = inputs[iInput];
-                final byte [] multTableRow = table[matrixRow[iInput] & 0xFF];
-                for (int iByte = offset; iByte < offset + byteCount; iByte++) {
+            for (int iByte = offset; iByte < offset + byteCount; iByte++) {
+                {
+                    final int iInput = 0;
+                    final byte[] inputShard = inputs[iInput];
+                    final byte[] multTableRow = table[matrixRow[iInput] & 0xFF];
                     outputShard[iByte] = multTableRow[inputShard[iByte] & 0xFF];
                 }
-            }
-            for (int iInput = 1; iInput < inputCount; iInput++) {
-                final byte [] inputShard = inputs[iInput];
-                final byte [] multTableRow = table[matrixRow[iInput] & 0xFF];
-                for (int iByte = offset; iByte < offset + byteCount; iByte++) {
+                for (int iInput = 1; iInput < inputCount; iInput++) {
+                    final byte[] inputShard = inputs[iInput];
+                    final byte[] multTableRow = table[matrixRow[iInput] & 0xFF];
                     outputShard[iByte] ^= multTableRow[inputShard[iByte] & 0xFF];
                 }
             }

@@ -50,7 +50,7 @@ public class ReedSolomonBenchmark {
 
         List<String> summaryLines = new ArrayList<String>();
         for (CodingLoop codingLoop : CodingLoop.ALL_CODING_LOOPS) {
-            System.out.println("\nTEST: " + codingLoop.getName());
+            System.out.println("\nTEST: " + codingLoop.getClass().getSimpleName());
             ReedSolomon codec = new ReedSolomon(DATA_COUNT, PARITY_COUNT, codingLoop);
             System.out.println("    warm up...");
             doOneMeasurement(codec, bufferSets);
@@ -61,7 +61,7 @@ public class ReedSolomonBenchmark {
                 total.add(doOneMeasurement(codec, bufferSets));
             }
             System.out.println(String.format("\nAVERAGE: %s", total));
-            summaryLines.add(String.format("    %-35s %s", codingLoop.getName(), total));
+            summaryLines.add(String.format("    %-35s %s", codingLoop.getClass().getSimpleName(), total));
         }
 
         System.out.println("\nSummary:\n");

@@ -31,18 +31,19 @@ public interface CodingLoop {
      */
     CodingLoop[] ALL_CODING_LOOPS =
             new CodingLoop[] {
+                    new IndexInputShardExpCodingLoop(),
+                    new IndexInputShardTableCodingLoop(),
                     new IndexShardInputExpCodingLoop(),
                     new IndexShardInputTableCodingLoop(),
+                    new InputIndexShardExpCodingLoop(),
+                    new InputIndexShardTableCodingLoop(),
+                    new InputShardIndexExpCodingLoop(),
+                    new InputShardIndexTableCodingLoop(),
+                    new ShardIndexInputExpCodingLoop(),
+                    new ShardIndexInputTableCodingLoop(),
                     new ShardInputIndexExpCodingLoop(),
                     new ShardInputIndexTableCodingLoop(),
-                    new InputShardIndexTableCodingLoop(),
-                    new InputIndexShardTableCodingLoop()
             };
-
-    /**
-     * Returns the human-readable name for this codec.
-     */
-    String getName();
 
     /**
      * Multiplies a subset of rows from a coding matrix by a full set of
