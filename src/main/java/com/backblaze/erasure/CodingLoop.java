@@ -65,7 +65,7 @@ public interface CodingLoop {
      *               that are used.  They will be ignored.  The number of
      *               inputs used is determined by the length of the
      *               each matrix row.
-     * @param inputCount THe number of input byte arrays.
+     * @param inputCount The number of input byte arrays.
      * @param outputs Byte arrays where the computed shards are stored.  The
      *                outputs array may also have extra, unused, elements
      *                at the end.  The number of outputs computed, and the
@@ -105,6 +105,7 @@ public interface CodingLoop {
      * @param offset The index in the inputs and output of the first byte
      *               to process.
      * @param byteCount The number of bytes to process.
+     * @param tempBuffer A place to store temporary results.  May be null.
      */
      boolean checkSomeShards(final byte [] [] matrixRows,
                              final byte [] [] inputs,
@@ -112,5 +113,6 @@ public interface CodingLoop {
                              final byte [] [] toCheck,
                              final int checkCount,
                              final int offset,
-                             final int byteCount);
+                             final int byteCount,
+                             final byte [] tempBuffer);
 }

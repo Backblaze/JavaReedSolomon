@@ -19,10 +19,11 @@ public abstract class CodingLoopBase implements CodingLoop {
             byte[][] matrixRows,
             byte[][] inputs, int inputCount,
             byte[][] toCheck, int checkCount,
-            int offset, int byteCount) {
+            int offset, int byteCount,
+            byte[] tempBuffer) {
 
         // This is the loop structure for ByteOutputInput, which does not
-        // require temorary buffers for checking.
+        // require temporary buffers for checking.
         byte [] [] table = Galois.MULTIPLICATION_TABLE;
         for (int iByte = offset; iByte < offset + byteCount; iByte++) {
             for (int iOutput = 0; iOutput < checkCount; iOutput++) {
