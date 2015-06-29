@@ -81,7 +81,25 @@ public class ReedSolomonTest {
                 new byte [] { 2, 4 },
                 new byte [] { 3, 5 }
         };
-        runEncodeDecode(dataShards);
+        runEncodeDecode(5, 5, dataShards);
+    }
+
+    /**
+     * Try encoding and decoding with a lot of shards.
+     */
+    @Test
+    public void testBigEncodeDecode() {
+        final Random random = new Random(0);
+        final int dataCount = 64;
+        final int parityCount = 64;
+        final int shardSize = 200;
+        byte [] [] dataShards = new byte [dataCount] [shardSize];
+        for (byte [] shard : dataShards) {
+            for (int i = 0; i < shard.length; i++) {
+                shard[i] = (byte) random.nextInt(256);
+            }
+        }
+        runEncodeDecode(dataCount, parityCount, dataShards);
     }
 
     /**
@@ -90,35 +108,36 @@ public class ReedSolomonTest {
      *
      * Uses 5+5 coding, so there must be 5 input data shards.
      */
-    private void runEncodeDecode(byte[][] dataShards) {
+    private void runEncodeDecode(int dataCount, int parityCount, byte[][] dataShards) {
 
+        final int totalCount = dataCount + parityCount;
         final int shardLength = dataShards[0].length;
 
         // Make the list of data and parity shards.
-        assertEquals(5, dataShards.length);
+        assertEquals(dataCount, dataShards.length);
         final int dataLength = dataShards[0].length;
-        byte [] [] allShards = new byte [10] [];
-        for (int i = 0; i < 5; i++) {
+        byte [] [] allShards = new byte [totalCount] [];
+        for (int i = 0; i < dataCount; i++) {
             allShards[i] = Arrays.copyOf(dataShards[i], dataLength);
         }
-        for (int i = 5; i < 10; i++) {
+        for (int i = dataCount; i < totalCount; i++) {
             allShards[i] = new byte [dataLength];
         }
 
         // Encode.
-        ReedSolomon codec = ReedSolomon.create(5, 5);
+        ReedSolomon codec = ReedSolomon.create(dataCount, parityCount);
         codec.encodeParity(allShards, 0, dataLength);
 
         // Make a copy to decode with.
-        byte [] [] testShards = new byte [10] [];
-        boolean [] shardPresent = new boolean [10];
-        for (int i = 0; i < 10; i++) {
+        byte [] [] testShards = new byte [totalCount] [];
+        boolean [] shardPresent = new boolean [totalCount];
+        for (int i = 0; i < totalCount; i++) {
             testShards[i] = Arrays.copyOf(allShards[i], shardLength);
             shardPresent[i] = true;
         }
 
         // Decode with 0, 1, ..., 5 shards missing.
-        for (int numberMissing = 0; numberMissing < 6; numberMissing++) {
+        for (int numberMissing = 0; numberMissing < parityCount + 1; numberMissing++) {
             tryAllSubsetsMissing(codec, allShards, testShards, shardPresent, numberMissing);
         }
     }

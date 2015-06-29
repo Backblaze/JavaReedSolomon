@@ -34,6 +34,15 @@ public class ReedSolomon {
      * Initializes a new encoder/decoder, with a chosen coding loop.
      */
     public ReedSolomon(int dataShardCount, int parityShardCount, CodingLoop codingLoop) {
+
+        // The academic papers say that the Vandermonde matrix is only
+        // guaranteed up to 256 rows.  In practice, the tests pass
+        // up to 248 data + 256 parity, but I don't understand the math
+        // well enough to trust that.
+        if (256 < dataShardCount + parityShardCount) {
+            throw new IllegalArgumentException("too many shards - max is 256");
+        }
+
         this.dataShardCount = dataShardCount;
         this.parityShardCount = parityShardCount;
         this.codingLoop = codingLoop;
