@@ -47,6 +47,7 @@ public class ReedSolomonBenchmark {
         for (int iBufferSet = 0; iBufferSet < NUMBER_OF_BUFFER_SETS; iBufferSet++) {
             bufferSets[iBufferSet] = new BufferSet();
         }
+        final byte [] tempBuffer = new byte [BUFFER_SIZE];
 
         List<String> summaryLines = new ArrayList<String>();
         StringBuilder csv = new StringBuilder();
@@ -79,7 +80,7 @@ public class ReedSolomonBenchmark {
                 doOneEncodeMeasurement(codec, bufferSets);
                 System.out.println("    testing...");
                 for (int iMeasurement = 0; iMeasurement < 10; iMeasurement++) {
-                    checkAverage.add(doOneCheckMeasurement(codec, bufferSets));
+                    checkAverage.add(doOneCheckMeasurement(codec, bufferSets, tempBuffer));
                 }
                 System.out.println(String.format("\nAVERAGE: %s", checkAverage));
                 summaryLines.add(String.format("    %-45s %s", testName, checkAverage));
@@ -122,7 +123,7 @@ public class ReedSolomonBenchmark {
         return result;
     }
 
-    private Measurement doOneCheckMeasurement(ReedSolomon codec, BufferSet[] bufferSets) {
+    private Measurement doOneCheckMeasurement(ReedSolomon codec, BufferSet[] bufferSets, byte [] tempBuffer) {
         long passesCompleted = 0;
         long bytesChecked = 0;
         long checkingTime = 0;
@@ -131,7 +132,7 @@ public class ReedSolomonBenchmark {
             nextBuffer = (nextBuffer + 1) % bufferSets.length;
             byte[][] shards = bufferSet.buffers;
             long startTime = System.currentTimeMillis();
-            if (!codec.isParityCorrect(shards, 0, BUFFER_SIZE)) {
+            if (!codec.isParityCorrect(shards, 0, BUFFER_SIZE, tempBuffer)) {
                 // if the parity is not correct, it will throw off the
                 // benchmarking because it may return early.
                 throw new RuntimeException("parity not correct");
