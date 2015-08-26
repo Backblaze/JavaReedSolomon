@@ -6,6 +6,8 @@
 
 package com.backblaze.erasure;
 
+import java.util.Arrays;
+
 /**
  * A matrix over the 8-bit Galois field.
  *
@@ -177,7 +179,7 @@ public class Matrix {
             return false;
         }
         for (int r = 0; r < rows; r++) {
-            if (!data[r].equals(((Matrix)other).data[r])) {
+            if (!Arrays.equals(data[r], ((Matrix)other).data[r])) {
                 return false;
             }
         }
