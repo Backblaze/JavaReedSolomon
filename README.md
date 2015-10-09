@@ -30,7 +30,7 @@ in the paper on [Screaming Fast Galois Field Arithmetic](http://www.kaymgee.com/
 
 ## Performance Notes
 
-The performance of the inner loop depends on the specefic processor
+The performance of the inner loop depends on the specific processor
 you're running on.  There are twelve different permutations of the
 loop in this library, and the ReedSolomonBenchmark class will tell
 you which one is faster for your particular application.  The number
