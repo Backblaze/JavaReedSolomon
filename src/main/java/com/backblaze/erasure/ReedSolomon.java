@@ -316,7 +316,7 @@ public class ReedSolomon {
 
         // Multiple by the inverse of the top square of the matrix.
         // This will make the top square be the identity matrix, but
-        // preserve the property that any square subset of rows  is
+        // preserve the property that any square subset of rows is
         // invertible.
         Matrix top = vandermonde.submatrix(0, 0, dataShards, dataShards);
         return vandermonde.times(top.invert());
