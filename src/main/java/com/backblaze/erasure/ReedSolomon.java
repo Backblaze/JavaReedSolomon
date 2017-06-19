@@ -35,10 +35,11 @@ public class ReedSolomon {
      */
     public ReedSolomon(int dataShardCount, int parityShardCount, CodingLoop codingLoop) {
 
-        // The academic papers say that the Vandermonde matrix is only
-        // guaranteed up to 256 rows.  In practice, the tests pass
-        // up to 248 data + 256 parity, but I don't understand the math
-        // well enough to trust that.
+        // We can have at most 256 shards total, as any more would
+        // lead to duplicate rows in the Vandermonde matrix, which
+        // would then lead to duplicate rows in the built matrix
+        // below. Then any subset of the rows containing the duplicate
+        // rows would be singular.
         if (256 < dataShardCount + parityShardCount) {
             throw new IllegalArgumentException("too many shards - max is 256");
         }
@@ -315,7 +316,7 @@ public class ReedSolomon {
 
         // Multiple by the inverse of the top square of the matrix.
         // This will make the top square be the identity matrix, but
-        // preserve the property that any square subset of rows  is
+        // preserve the property that any square subset of rows is
         // invertible.
         Matrix top = vandermonde.submatrix(0, 0, dataShards, dataShards);
         return vandermonde.times(top.invert());
