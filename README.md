@@ -31,12 +31,12 @@ public class test {
         byte[] en_data;
         en_data=rsProcessor.rs_Encoder(data, sliceLength, sliceCount, fecSliceCount);
         
-//==================Test use: second pieces of data are lost, and the decoding code has the corresponding test code(测试使用：让第二片数据丢失，解码代码中也有对应的测试代码)===================
+	//==================Test use: second pieces of data are lost, and the decoding code has the corresponding test code(测试使用：让第二片数据丢失，解码代码中也有对应的测试代码)===================
         byte[] temp = new byte[250];
         System.arraycopy(temp, 0, en_data, 250, 250);
-//============================================================================================================================================================================
+						//=======================================================================================================================================
         
-        boolean[] eraserFlag=new boolean[sliceCount+fecSliceCount];
+	boolean[] eraserFlag=new boolean[sliceCount+fecSliceCount];
         for(int i=0;i<eraserFlag.length;i++){
         	eraserFlag[i]=true;
         }
