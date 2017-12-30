@@ -14,9 +14,9 @@ First, I read and learn the code of this excellent project. Then, on the basis o
 	public class test {
 		public static void main(String[] args) {
 
-			IRSErasureCorrection rsProcessor=new RSErasureCorrectionImpl();
+		IRSErasureCorrection rsProcessor=new RSErasureCorrectionImpl();
 
-			byte[] data=new byte[1000]; 
+		byte[] data=new byte[1000]; 
 		for(int i=0; i<data.length; i++) {  
 		    data[i] = 1;  
 		}  
@@ -42,8 +42,8 @@ First, I read and learn the code of this excellent project. Then, on the basis o
 		}
 		eraserFlag[1]=false;
 
-			int result=rsProcessor.rs_Decoder(en_data, sliceLength, sliceCount, fecSliceCount=2, eraserFlag);
-			System.out.println("complete test!");//测试完毕！
+		int result=rsProcessor.rs_Decoder(en_data, sliceLength, sliceCount, fecSliceCount=2, eraserFlag);
+		System.out.println("complete test!");//测试完毕！
 		}
 
 	}
