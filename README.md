@@ -4,13 +4,13 @@ First, I read and learn the code of this excellent project. Then, on the basis o
 首先，我阅读并学习这个优秀项目的代码，然后，我在这个很棒的工作的基础上添加了处理字节数组数据的接口和实现，以便我们可以实现字节数组纠删算法的处理。你可以将其应用到网络数据传输的纠删处理上，算法的效率和能力很棒。
 
 ## example
-package com.backblaze.erasure.robinliew.dealbytesinterface;
+	package com.backblaze.erasure.robinliew.dealbytesinterface;
 
-/**
- * 
- * @author RobinLiew 2017.9.21
- *
- */
+	/**
+	 * 
+	 * @author RobinLiew 2017.9.21
+	 *
+	 */
 	public class test {
 		public static void main(String[] args) {
 
