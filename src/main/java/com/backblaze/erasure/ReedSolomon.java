@@ -296,7 +296,7 @@ public class ReedSolomon {
             throw new IllegalArgumentException("byteCount is negative: " + byteCount);
         }
         if (shardLength < offset + byteCount) {
-            throw new IllegalArgumentException("buffers to small: " + byteCount + offset);
+            throw new IllegalArgumentException("buffers too small: " + byteCount + offset);
         }
     }
 

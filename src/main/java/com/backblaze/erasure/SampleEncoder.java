@@ -6,11 +6,11 @@
 
 package com.backblaze.erasure;
 
+import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 
@@ -30,9 +30,9 @@ import java.nio.ByteBuffer;
  */
 public class SampleEncoder {
 
-    public static final int DATA_SHARDS = 4;
+    public static final int DATA_SHARDS   = 4;
     public static final int PARITY_SHARDS = 2;
-    public static final int TOTAL_SHARDS = 6;
+    public static final int TOTAL_SHARDS  = DATA_SHARDS + PARITY_SHARDS;
 
     public static final int BYTES_IN_INT = 4;
 
@@ -49,7 +49,7 @@ public class SampleEncoder {
             return;
         }
 
-        // Get the size of the input file.  (Files bigger that
+        // Get the size of the input file.  (Files bigger than
         // Integer.MAX_VALUE will fail here!)
         final int fileSize = (int) inputFile.length();
 
@@ -62,13 +62,8 @@ public class SampleEncoder {
         // the contents of the file.
         final int bufferSize = shardSize * DATA_SHARDS;
         final byte [] allBytes = new byte[bufferSize];
-        ByteBuffer.wrap(allBytes).putInt(fileSize);
-        InputStream in = new FileInputStream(inputFile);
-        int bytesRead = in.read(allBytes, BYTES_IN_INT, fileSize);
-        if (bytesRead != fileSize) {
-            throw new IOException("not enough bytes read");
-        }
-        in.close();
+
+        readAllBytesPrefixedWithFileSize(inputFile, fileSize, allBytes);
 
         // Make the buffers to hold the shards.
         byte [] [] shards = new byte [TOTAL_SHARDS] [shardSize];
@@ -91,6 +86,19 @@ public class SampleEncoder {
             out.write(shards[i]);
             out.close();
             System.out.println("wrote " + outputFile);
+        }
+    }
+
+    private static void readAllBytesPrefixedWithFileSize(final File inputFile, final int fileSize, final byte [] allBytes) throws IOException {
+
+        final ByteBuffer      buffer          = ByteBuffer.wrap(allBytes).putInt(fileSize);
+
+        final FileInputStream fileInputStream = new FileInputStream(inputFile);
+        final DataInputStream dataInputStream = new DataInputStream(fileInputStream);
+        try {
+            dataInputStream.readFully(buffer.array(), buffer.position(), fileSize);
+        } finally {
+            dataInputStream.close();
         }
     }
 }
