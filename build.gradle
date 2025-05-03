@@ -1,9 +1,11 @@
-apply plugin: 'java'
+plugins {
+    id 'java'
+}
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    testCompile group: 'junit', name: 'junit', version: '4.+'
+    testImplementation group: 'junit', name: 'junit', version: '4.+'
 }
