@@ -32,6 +32,14 @@ public class ReedSolomonBenchmark {
 
     private static final long MEASUREMENT_DURATION = 2 * 1000;
 
+    private static final CodingLoop[] CODING_LOOPS = CodingLoop.ALL_CODING_LOOPS;
+    // alternatively, just benchmark the most-performant CodingLoop
+    // private static final CodingLoop[] CODING_LOOPS = new CodingLoop[] {CodingLoop.BEST_CODING_LOOP};
+
+    private static final int BANDWIDTH_COUNT = DATA_COUNT;
+    // alternatively, add parity shards for the bandwidth calculation, to compare with other implementations
+    // private static final int BANDWIDTH_COUNT = TOTAL_COUNT;
+
     private static final Random random = new Random();
 
     private int nextBuffer = 0;
@@ -52,7 +60,7 @@ public class ReedSolomonBenchmark {
         List<String> summaryLines = new ArrayList<String>();
         StringBuilder csv = new StringBuilder();
         csv.append("Outer,Middle,Inner,Multiply,Encode,Check\n");
-        for (CodingLoop codingLoop : CodingLoop.ALL_CODING_LOOPS) {
+        for (CodingLoop codingLoop : CODING_LOOPS) {
             Measurement encodeAverage = new Measurement();
             {
                 final String testName = codingLoop.getClass().getSimpleName() + " encodeParity";
@@ -113,7 +121,7 @@ public class ReedSolomonBenchmark {
             codec.encodeParity(shards, 0, BUFFER_SIZE);
             long endTime = System.currentTimeMillis();
             encodingTime += (endTime - startTime);
-            bytesEncoded += BUFFER_SIZE * DATA_COUNT;
+            bytesEncoded += BUFFER_SIZE * BANDWIDTH_COUNT;
             passesCompleted += 1;
         }
         double seconds = ((double)encodingTime) / 1000.0;
@@ -139,7 +147,7 @@ public class ReedSolomonBenchmark {
             }
             long endTime = System.currentTimeMillis();
             checkingTime += (endTime - startTime);
-            bytesChecked += BUFFER_SIZE * DATA_COUNT;
+            bytesChecked += BUFFER_SIZE * BANDWIDTH_COUNT;
             passesCompleted += 1;
         }
         double seconds = ((double)checkingTime) / 1000.0;
