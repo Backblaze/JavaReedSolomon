@@ -56,6 +56,12 @@ public interface CodingLoop {
             };
 
     /**
+     * The best implementation as determined by {@link ReedSolomonBenchmark} over
+     * {@link #ALL_CODING_LOOPS}.
+     */
+    CodingLoop BEST_CODING_LOOP = new InputOutputByteTableCodingLoop();
+
+    /**
      * Multiplies a subset of rows from a coding matrix by a full set of
      * input shards to produce some output shards.
      *

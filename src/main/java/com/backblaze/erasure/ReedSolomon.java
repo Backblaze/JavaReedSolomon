@@ -27,7 +27,7 @@ public class ReedSolomon {
      * Creates a ReedSolomon codec with the default coding loop.
      */
     public static ReedSolomon create(int dataShardCount, int parityShardCount) {
-        return new ReedSolomon(dataShardCount, parityShardCount, new InputOutputByteTableCodingLoop());
+        return new ReedSolomon(dataShardCount, parityShardCount, CodingLoop.BEST_CODING_LOOP);
     }
 
     /**
