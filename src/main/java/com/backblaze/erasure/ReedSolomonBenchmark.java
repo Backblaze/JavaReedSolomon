@@ -76,8 +76,8 @@ public class ReedSolomonBenchmark {
                 System.out.println("\nTEST: " + testName);
                 ReedSolomon codec = new ReedSolomon(DATA_COUNT, PARITY_COUNT, codingLoop);
                 System.out.println("    warm up...");
-                doOneEncodeMeasurement(codec, bufferSets);
-                doOneEncodeMeasurement(codec, bufferSets);
+                doOneCheckMeasurement(codec, bufferSets, tempBuffer);
+                doOneCheckMeasurement(codec, bufferSets, tempBuffer);
                 System.out.println("    testing...");
                 for (int iMeasurement = 0; iMeasurement < 10; iMeasurement++) {
                     checkAverage.add(doOneCheckMeasurement(codec, bufferSets, tempBuffer));
